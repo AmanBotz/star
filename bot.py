@@ -23,7 +23,7 @@ user_cookies = {}
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 # Your API credentials are now provided directly.
 API_ID = 23288918
-API_HASH = "7265045232:AAFLB67cliDaLp-QspmXQpr_3kP5YsEJYIY"
+API_HASH = "fd2b1b2e0e6b2addf6e8031f15e511f2"
 
 # Initialize the Pyrogram client with your bot token, API id, and API hash.
 app = Client("hotstar_bot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
