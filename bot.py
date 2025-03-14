@@ -21,27 +21,26 @@ user_cookies = {}
 
 # Get environment variables.
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-# FILE_SERVER_BASE_URL is not used in this version since we are sending the file directly.
-# But you can keep it for reference.
-FILE_SERVER_BASE_URL = os.environ.get("FILE_SERVER_BASE_URL", "http://localhost:8000")
+# Your API credentials are now provided directly.
+API_ID = 23288918
+API_HASH = "7265045232:AAFLB67cliDaLp-QspmXQpr_3kP5YsEJYIY"
 
-# Initialize the Pyrogram client.
-app = Client("hotstar_bot", bot_token=BOT_TOKEN)
+# Initialize the Pyrogram client with your bot token, API id, and API hash.
+app = Client("hotstar_bot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 
 @app.on_message(filters.command("start"))
 async def start(client: Client, message: Message):
     """Simple /start command to welcome the user."""
     await message.reply_text(
         "Welcome to the Hotstar Downloader Bot!\n\n"
-        "First, send /setcookies with your cookies file (plain text) as an attachment. "
-        "Then use /download <Hotstar URL> to download a video which will be sent back as a video message."
+        "Please send /setcookies with your cookies file (plain text) first, then use /download <Hotstar URL> to download a video."
     )
 
 @app.on_message(filters.command("setcookies"))
 async def set_cookies(client: Client, message: Message):
     """
     /setcookies command:
-    Save the attached cookies file to cookies/<user_id>.txt.
+    Expects the user to attach a cookies file. The bot saves it under cookies/<user_id>.txt.
     """
     if message.document:
         file_path = os.path.join(COOKIES_DIR, f"{message.from_user.id}.txt")
@@ -55,8 +54,9 @@ async def set_cookies(client: Client, message: Message):
 async def download_video(client: Client, message: Message):
     """
     /download command:
-    Downloads a video from the provided Hotstar URL using the stored cookies,
-    sends the video file directly to the user, and deletes the file afterward.
+    Expects: /download <Hotstar Video URL>
+    Uses the stored cookies for this user and runs yt-dlp to download the video.
+    Then sends the downloaded video as a Telegram video message and deletes it from disk.
     """
     if len(message.command) < 2:
         await message.reply_text("Usage: /download <Hotstar Video URL>")
@@ -66,7 +66,7 @@ async def download_video(client: Client, message: Message):
     user_id = message.from_user.id
 
     if user_id not in user_cookies:
-        await message.reply_text("No cookies file found. Please use /setcookies first.")
+        await message.reply_text("No cookies file found. Please send your cookies using /setcookies first.")
         return
 
     cookies_file = user_cookies[user_id]
